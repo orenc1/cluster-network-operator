@@ -920,9 +920,13 @@ func renderNetworkingConsolePlugin(manifestDir string, bootstrapResult *bootstra
 
 	consolePluginImage, ok := os.LookupEnv("NETWORKING_CONSOLE_PLUGIN_IMAGE")
 	if !ok {
-		return nil, errors.Errorf("Could not get NETWORKING_CONSOLE_PLUGIN_IMAGE env var")
+		// temporary fallback until the image quay.io/openshift/origin-networking-console-plugin:latest
+		// will be published
+		tmpFallbackConsoleImage := "quay.io/orenc/networking-console-plugin:4.16"
+		data.Data["NetworkingConsolePluginImage"] = tmpFallbackConsoleImage
+	} else {
+		data.Data["NetworkingConsolePluginImage"] = consolePluginImage
 	}
-	data.Data["NetworkingConsolePluginImage"] = consolePluginImage
 
 	manifests, err := render.RenderDir(filepath.Join(manifestDir, "networking-console-plugin"), &data)
 	if err != nil {
